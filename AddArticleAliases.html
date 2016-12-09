@@ -1,0 +1,85 @@
+<html>
+
+<head>
+
+
+<title>
+
+</title>
+<script type='text/javascript' src='http://code.jquery.com/jquery-latest.js' />
+<script type='text/javascript'>
+
+</script>
+<script  type='text/javascript'>
+window.onload = function() {
+
+function compileWord(strFileLine)
+{
+	var pattFunc = new RegExp("(jQuery)*\.[a-z]+[A-Z]*\(.*\)");
+	var pattSelector = new RegExp(":[a-z\-]+[A-Z]*\(.*\)");
+	
+	var bln_pattFunc = pattFunc.test(strFileLine);
+	var bln_pattSelector = pattSelector.test(strFileLine);
+	
+	var str_Result
+	if(bln_pattFunc)
+	{
+		str_Result = strFileLine.replace("\.", " ").replace("\(", "").replace("\)", "").replace("jQuery", " ");
+	}
+	
+	if(bln_pattSelector)
+	{
+		str_Result = str_Result.replace("\:", " ").replace("\(", "").replace("\)", "");
+	}
+	return str_Result.replace(/([a-z])([A-Z])/g, '$1 $2')
+	
+}
+
+
+function compileLines(strFile)
+{
+	var strFileLines =  strFile.split('\n');
+	var strOutput ="";
+	$.each(strFileLines, function( index, value ) {
+		strOutput +=  strFileLines[index] + "			==>" + "	" + compileWord(strFileLines[index]) + '\n';
+	});
+	return strOutput;
+}
+	///
+        var fileInput = document.getElementById('fileInput');
+        var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+        fileInput.addEventListener('change', function(e) {
+            var file = fileInput.files[0];
+            //var textType = /text.* /;
+			var textType = new RegExp("text.*");
+			
+
+            if (textType.test(file.type)) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+					fileDisplayArea.innerText = compileLines(reader.result);					
+                }
+
+                reader.readAsText(file);    
+            } else {
+                fileDisplayArea.innerText = "File not supported!"
+            }
+        });
+}
+
+</script>
+
+</head>
+
+
+<body>
+	<h1>Add Article Aliases</h1>
+        <div>
+            Select a text file: 
+            <input type="file" id="fileInput">
+        </div>
+		<div id="fileDisplayArea">
+		</div>
+</body>
